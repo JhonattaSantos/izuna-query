@@ -24,6 +24,11 @@ class Select
 		return preg_replace("/\s+/"," ",$this->query);
 	}
 
+	public function hasProperty($property)
+	{
+		return (isset($this->filter[$property])) ? true : false;
+	}
+
 	public function getAtributes()
 	{
 		if(!isset($this->filter['attr']))
@@ -103,6 +108,25 @@ class Select
 
 		$where .= implode(" AND ", $wheres);
 		return $where;
+	}
+
+	public function getOrderBy()
+	{ 
+		$orderBy = "ORDER BY ";		
+
+		foreach ($this->filter['order_by'] as $key => $value)
+		{
+				
+			if($key == key($this->filter['order_by'])){
+				$orderBy .= $value['attr']." ".$value['order'];
+			}else{
+				$orderBy .= ", ".$value['attr']." ".$value['order'];
+			}		
+		
+		}
+	
+
+		return $orderBy;
 	}
 
 }

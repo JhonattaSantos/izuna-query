@@ -35,8 +35,8 @@ class UnitTest extends TestCase
 		$filtro = [];
 		$select = new Select("tb_name", $filtro);	
 
-		$hasNoGroupBy = $select->hasGroupBy();
-		$hasNoAgregation = $select->hasAggregation();
+		$hasNoGroupBy = $select->hasProperty('group_by');
+		$hasNoAgregation = $select->hasProperty('aggregation');
 		$this->assertFalse($hasNoGroupBy);
 		$this->assertFalse($hasNoAgregation);
 	}
@@ -50,7 +50,7 @@ class UnitTest extends TestCase
 		];
 
 		$select = new Select("tb_name", $filtro);
-		$hasGroupBy = $select->hasGroupBy();
+		$hasGroupBy = $select->hasProperty('group_by');
 		$groupBy = $select->getGroupBy();
 
         $this->assertTrue($hasGroupBy);
@@ -64,7 +64,7 @@ class UnitTest extends TestCase
 		];
 
 		$select = new Select("tb_name", $filtro);	
-		$hasAggregation = $select->hasAggregation();	
+		$hasAggregation = $select->hasProperty('aggregation');	
 		$aggregation = $select->getAggregation();
 
 		$this->assertTrue($hasAggregation);
@@ -83,7 +83,7 @@ class UnitTest extends TestCase
 		];
 
 		$select = new Select("tb_name", $filtro);
-		$hasWhere = $select->hasWhere();		
+		$hasWhere = $select->hasProperty('where');		
 		$where = $select->getWhere();
 
 		$this->assertTrue($hasWhere);
@@ -106,10 +106,56 @@ class UnitTest extends TestCase
 		];
 
 		$select = new Select("tb_name", $filtro);
-		$hasWhere = $select->hasWhere();		
+		$hasWhere = $select->hasProperty('where');		
 		$where = $select->getWhere();
 
 		$this->assertTrue($hasWhere);
 		$this->assertEquals("WHERE name = 'PB' AND age >= 18",$where);
+	}
+
+	public function testSimpleOrderBy()
+	{
+		$filtro = [
+			"order_by" => [
+				[
+					"attr" =>"name", 
+					"order" => "DESC"
+				]
+			]
+		];
+
+		$select = new Select("tb_name", $filtro);
+		$hasOrderBy = $select->hasProperty('order_by');
+		$orderBy =  $select->getOrderBy();
+
+		$this->assertTrue($hasOrderBy);
+		$this->assertEquals("ORDER BY name DESC",$orderBy);
+	}
+
+	public function testOrderByWithMutiplusParams()
+	{
+		$filtro = [
+			"order_by" => [
+				[
+					"attr" => "name", 
+					"order"=> "DESC"
+				],
+				[
+					"attr" => "age", 
+					"order" => "ASC"
+				],
+				[
+					"attr" => "uf",
+					"order" => "ASC"
+				]				
+			]
+		];
+
+		$select = new Select("tb_name", $filtro);
+		$hasOrderBy = $select->hasProperty('order_by');
+		$orderBy =  $select->getOrderBy();
+
+		$this->assertTrue($hasOrderBy);
+		$this->assertEquals("ORDER BY name DESC, age ASC, uf ASC",$orderBy);
 	}
 }
